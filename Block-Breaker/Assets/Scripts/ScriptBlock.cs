@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,17 +12,61 @@ public class ScriptBlock : MonoBehaviour
     GameSession gameStatus;
 
     [SerializeField] GameObject sparklesVFX;
+    [SerializeField] Sprite[] hitSprites;
+
+    //state
+    [SerializeField] int timesHit;           //only serialized for debug pruposes
 
     private void Start()
     {
-        level = FindObjectOfType<Level>();
-        level.CountBreakableBlocks();
+        CountBreakable();
+
         gameStatus = FindObjectOfType<GameSession>();
+    }
+
+    private void CountBreakable()
+    {
+        level = FindObjectOfType<Level>();
+        if (tag == "Breakable")
+        {
+            
+            level.CountBreakableBlocks();
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        DestroyBlock();
+        if (tag == "Breakable")
+        {
+            HandleBlockHits();
+        }
+
+    }
+
+    private void HandleBlockHits()
+    {
+        timesHit++;
+        if (timesHit >= hitSprites.Length + 1)
+        {
+            DestroyBlock();
+        }
+        else
+        {
+            ShowNextHitSprite();
+        }
+    }
+
+    private void ShowNextHitSprite()
+    {
+        if(hitSprites[timesHit-1]!= null)
+        {
+            GetComponent<SpriteRenderer>().sprite = hitSprites[timesHit - 1];
+        }
+        else
+        {
+            Debug.Log("Block Sprite missing!!! " + gameObject.name);
+        }
+        
     }
 
     private void DestroyBlock()
@@ -36,6 +81,6 @@ public class ScriptBlock : MonoBehaviour
     private void TriggerSparklesVFX()
     {
         GameObject.Instantiate(sparklesVFX, transform.position, transform.rotation);
-        Destroy(sparklesVFX, 2f);
+        //Destroy(sparklesVFX);
     }
 }
