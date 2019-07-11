@@ -8,13 +8,15 @@ public class ScriptBlock : MonoBehaviour
 
     //Cached components
     Level level;
-    GameStatus gameStatus;
+    GameSession gameStatus;
+
+    [SerializeField] GameObject sparklesVFX;
 
     private void Start()
     {
         level = FindObjectOfType<Level>();
         level.CountBreakableBlocks();
-        gameStatus = FindObjectOfType<GameStatus>();
+        gameStatus = FindObjectOfType<GameSession>();
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -28,5 +30,12 @@ public class ScriptBlock : MonoBehaviour
         level.BlockDestroy();
         gameStatus.CalculateScore();
         Destroy(gameObject);
+        TriggerSparklesVFX();
+    }
+
+    private void TriggerSparklesVFX()
+    {
+        GameObject.Instantiate(sparklesVFX, transform.position, transform.rotation);
+        Destroy(sparklesVFX, 2f);
     }
 }
